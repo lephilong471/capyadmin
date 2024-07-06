@@ -128,18 +128,20 @@ const AdminNotifications = () => {
     setPredict(null)
   }
 
-  const handleCheckGrammar = () => {
-    if (!addInfo.title || !addInfo.content) showAlert('danger')
+  const handleCheckSentiment = () => {
+    if (!addInfo.content) showAlert('danger')
     else {
       setStatus(1)
       axios({
         method: 'POST',
-        url: `${config.proxy}/api/check-grammar-data`,
-        data: addInfo,
+        url: `${config.proxy}/api/check-sentiment-data`,
+        data: {
+          data: addInfo.content,
+        },
       })
         .then(function (res) {
           if (res.status === 200) {
-            setPredict(res.data.data)
+            setPredict(res.data.predict)
             setCheck(true)
             setStatus(2)
           }
@@ -405,18 +407,22 @@ const AdminNotifications = () => {
                     value={addInfo.title}
                     onChange={(e) => setAddInfo((prev) => ({ ...prev, title: e.target.value }))}
                   />
-                  {predict &&
-                    (predict.title === '0' ? (
-                      <div className="text-warning fw-bold fst-italic">False grammar</div>
-                    ) : (
-                      <div className="text-success fw-bold fst-italic">True grammar</div>
-                    ))}
                 </CCol>
               </CRow>
               <CRow className="my-2 d-flex justify-content-center">
                 <CCol md={6}>
-                  <CFormLabel htmlFor="content" className="fs-5 fw-bold fst-italic">
-                    Content
+                  <CFormLabel htmlFor="content">
+                    <span className="fs-5 fw-bold fst-italic">Content</span>
+                    {predict &&
+                      (parseInt(predict) === 0 ? (
+                        <span className="text-warning fw-bold fst-italic fw-none mx-2">
+                          Negative
+                        </span>
+                      ) : (
+                        <span className="text-success fw-bold fst-italic fw-none mx-2">
+                          Positive
+                        </span>
+                      ))}
                   </CFormLabel>
 
                   <CFormTextarea
@@ -424,13 +430,6 @@ const AdminNotifications = () => {
                     value={addInfo.content}
                     onChange={(e) => setAddInfo((prev) => ({ ...prev, content: e.target.value }))}
                   />
-
-                  {predict &&
-                    (predict.content === '0' ? (
-                      <div className="text-warning fw-bold fst-italic">False grammar</div>
-                    ) : (
-                      <div className="text-success fw-bold fst-italic">True grammar</div>
-                    ))}
                 </CCol>
               </CRow>
               <CRow className="my-2 d-flex justify-content-center">
@@ -457,12 +456,12 @@ const AdminNotifications = () => {
                   )}
                   {!check && status === 0 && (
                     <CButton
-                      onClick={handleCheckGrammar}
+                      onClick={handleCheckSentiment}
                       className={disabled ? 'disabled fw-bold' : 'fw-bold'}
                       variant="outline"
                       color="secondary"
                     >
-                      Check grammar
+                      Check Sentiment
                     </CButton>
                   )}
                 </CCol>
