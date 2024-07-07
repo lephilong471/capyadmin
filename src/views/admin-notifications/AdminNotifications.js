@@ -414,7 +414,7 @@ const AdminNotifications = () => {
                   <CFormLabel htmlFor="content">
                     <span className="fs-5 fw-bold fst-italic">Content</span>
                     {predict &&
-                      (parseInt(predict) === 0 ? (
+                      (predict === 'negative' ? (
                         <span className="text-warning fw-bold fst-italic fw-none mx-2">
                           Negative
                         </span>
