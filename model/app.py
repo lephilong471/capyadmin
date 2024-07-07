@@ -10,8 +10,8 @@ app = Flask(__name__)
 CORS(app)
 device = torch.device('cpu')
 
-model = SentimentRNN(2, 1001, 256, 64, 1, drop_prob=0.5)
-model.load_state_dict(torch.load('sentiment_model.pth',map_location=device))
+model = SentimentRNN(3, 1001, 256, 64, 1, drop_prob=0.5)
+model.load_state_dict(torch.load('sentiment140_model.pth',map_location=device))
 model.eval()
 
 @app.route('/')
@@ -22,7 +22,7 @@ def predict(sentiment_model, data, hidden, device):
     for i in data:
         h = tuple([each.data for each in hidden])
         output, h = sentiment_model(i[0].to(device),h)
-        return torch.round(output.squeeze()).detach().numpy()
+        return output.squeeze().detach().numpy()
 
 @app.route('/api/check-sentiment-data', methods=['POST'])
 def check_sentiment_data():
@@ -34,7 +34,7 @@ def check_sentiment_data():
     
     
     result = predict(model, data_loader, model.init_hidden(len(list_input)), device)
-    return jsonify({'predict': str(result)}), 200
+    return jsonify({'predict': "positive" if result > 0.5 else "negative"}), 200
     
 if __name__ == '__main__':
     app.run(debug=True)
